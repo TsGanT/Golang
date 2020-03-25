@@ -1,2 +1,2 @@
 # Golang
-Some useful cryptography program in R
+Some useful cryptography program in Golang
