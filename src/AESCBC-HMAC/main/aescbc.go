@@ -15,13 +15,13 @@ import (
 )
 
 const DescriptionTemplate = `
-usage: encrypt-auth <mode> -k <32-byte key in hexadecimal> -i <input file> -o <output file>
+usage: encrypt-auth <mode> -k <32-byte key in hexadecimal> -i <input file> -O <output file>
 
 Where <mode> is one of either encrypt or decrypt, and the input/output ﬁles contain raw binary data. 
 You should parse the ﬁrst 16 bytes of the key as the encryption key k enc , 
 and the second 16 bytes as the MAC key k mac .
 YOu can run the program as:
-go run test.go --Auth "decrypt" -K 123tangshitangsh87654321abcdefgh -I "test.txt" -O "result.txt"
+go run aescbc.go --Auth "decrypt" -K 123tangshitangsh87654321abcdefgh -I "test.txt" -O "result.txt"
 
 Enjoy!
 `
@@ -51,16 +51,16 @@ func BytesToInt(buf []byte) int {
 	return int(binary.BigEndian.Uint64(buf))
 }
 
-func Padding(plainText []byte, blockSize int) []byte {
-	n := blockSize - len(plainText)%blockSize
-	temp := bytes.Repeat([]byte{byte(n)}, n)
-	plainText = append(plainText, temp...)
-	return plainText
+func PKCS5Padding(plaintext []byte, blockSize int) []byte {
+	padding := blockSize - len(plaintext)%blockSize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(plaintext, padtext...)
 }
-func UnPadding(cipherText []byte) []byte {
-	end := cipherText[len(cipherText)-1]
-	cipherText = cipherText[:len(cipherText)-int(end)]
-	return cipherText
+
+func PKCS5UnPadding(origData []byte) []byte {
+	length := len(origData)
+	unpadding := int(origData[length-1])
+	return origData[:(length - unpadding)]
 }
 
 func HashMac(Kmac []byte, M []byte) [32]byte {
@@ -83,30 +83,7 @@ func ComputeM2(m []byte, Tag [32]byte) []byte {
 	M2 := append(m, Tag[:]...)
 	return M2
 }
-func ComputeM3(m []byte) []byte {
-	n := 16 - len(m)%16
-	var PS []byte
-	if n == 0 {
-		PS = bytes.Repeat(IntToBytes(16), 16)
-	}
-	if n != 0 {
-		PS = bytes.Repeat(IntToBytes(16-n), 16-n)
-	}
-	M3 := append(m, PS...)
-	return M3
-}
 
-func deM3(m []byte) []byte {
-	a := m[len(m)-1]
-	// b := m[len(m)-8 : len(m)]
-	// c := bytes.Repeat(b, int(a))
-	if int(a) > 16 {
-		return nil
-	}
-	n := int(a) * 8
-	res := m[:len(m)-n]
-	return res
-}
 func deM2(m []byte) []byte {
 	res := m[:len(m)-32]
 	return res
@@ -117,7 +94,7 @@ func AES_CBC_Encrypt(plainText []byte, iv []byte, key []byte) []byte {
 	if err != nil {
 		panic(err)
 	}
-	plainText = Padding(plainText, block.BlockSize()) //padding here
+	plainText = PKCS5Padding(plainText, block.BlockSize()) //padding here
 	blockMode := cipher.NewCBCEncrypter(block, iv)
 	cipherText := make([]byte, len(plainText))
 	blockMode.CryptBlocks(cipherText, plainText)
@@ -131,7 +108,7 @@ func AES_CBC_Decrypt(cipherText []byte, iv []byte, key []byte) []byte {
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	plainText := make([]byte, len(cipherText))
 	blockMode.CryptBlocks(plainText, cipherText)
-	plainText = UnPadding(plainText)
+	plainText = PKCS5UnPadding(plainText)
 	return plainText
 }
 
@@ -142,26 +119,34 @@ func VerifyHamc(m []byte, Kmac []byte) int {
 	return bytes.Compare(Tag[:], ver)
 }
 
+func AddIv(cipherText []byte, iv []byte) []byte {
+	Final := append(iv, cipherText...)
+	//fmt.Println(Final)
+	return Final
+}
+
+func DeIv(plaintext []byte, iv []byte) []byte {
+	First := plaintext[len(iv):]
+	//fmt.Println(First)
+	return First
+}
+
 func EnAESCBCHmac(plainText []byte, iv []byte, Ksec []byte, Kmac []byte) []byte {
 	Tag := HashMac(plainText, Kmac)
 	M2 := ComputeM2(plainText, Tag)
-	M3 := ComputeM3(M2)
-	cipherText := AES_CBC_Encrypt(M3, iv, Ksec)
-	return cipherText
+	cipherText := AES_CBC_Encrypt(M2, iv, Ksec)
+	c := AddIv(cipherText, iv)
+	return c
 }
 
 func DeAESCBCHmac(cipherText []byte, iv []byte, Ksec []byte, Kmac []byte) []byte {
-	plainText := AES_CBC_Decrypt(cipherText, iv, Ksec)
-	dem3 := deM3(plainText)
-	if dem3 == nil {
-		fmt.Printf("You used a wrong key!!")
-		return nil
-	}
-	if VerifyHamc(dem3, Kmac) != 0 {
+	p := DeIv(cipherText, iv)
+	plainText := AES_CBC_Decrypt(p, iv, Ksec)
+	if VerifyHamc(plainText, Kmac) != 0 {
 		fmt.Printf("Hmac Verify Failed!!!")
 		return nil
 	}
-	dem2 := deM2(dem3)
+	dem2 := deM2(plainText)
 	return dem2
 }
 

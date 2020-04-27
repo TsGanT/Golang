@@ -1,0 +1,8 @@
+He is a talented student from Johns Hopkins University majored in Information Security. Having well understanding on both theory and practice, he has great interesting in cybersecurity, cryptography system as well as protocol security.
+
+He is skilled at not only information security but also computer programming. In the period of his study, he always uses computer languages such as python and Golang to implement some important protocols such as TCP/IP, TLS as well as some essential cryptography algorithms such as AES-CBC with HMAC by himself. Familiar with Python, Go as well as SQL, he has the ability to be a great team member and finish his task efficiently as well as cooperate with others.
+
+
+I am a talented student from Johns Hopkins University majored in Information Security. Having well understanding on both theory and practice, I have great interesting in cybersecurity, cryptography system as well as protocol security.
+
+I am skilled at not only information security but also computer programming. In the period of my study, I always uses computer languages such as python and Golang to implement some important protocols such as TCP/IP, TLS as well as some essential cryptography algorithms such as AES-CBC with HMAC by himself. Familiar with Python, Go as well as SQL, I have the ability to be a great team member and finish his task efficiently as well as cooperate with others.

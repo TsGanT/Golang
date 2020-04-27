@@ -180,7 +180,7 @@ func main() {
 				if HillClimbing(encoded) > ClimbValue { //if Trigram(encoded)[0] > 0.00035
 					ClimbValue = HillClimbing(encoded)
 					fmt.Print(ClimbValue)
-					if ClimbValue > 0.0589 {
+					if ClimbValue > 0.01 {
 						tmpl, _ := template.New("cli").Parse(OutputTemplate)
 						err := tmpl.Execute(os.Stdout, struct {
 							Original, Plain, Encoded string
