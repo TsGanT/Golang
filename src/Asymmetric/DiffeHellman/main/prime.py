@@ -3,7 +3,7 @@ import random
 sys.setrecursionlimit(10000)
 
 def big_odd(b):
-    num1 = pow(2,1023)+1
+    num1 = pow(2,5)+1
     res = num1+b*2
     return res
 
@@ -44,7 +44,7 @@ def TestMillarRabin(p, root):
     return p 
 
 def GetPrime():
-    seed = random.randint(0,5000)
+    seed = 0 #random.randint(0,5000)
     for i in range(seed, seed+1000):
         resp = big_odd(i)
         res2 = TestMillarRabin(resp, 7)

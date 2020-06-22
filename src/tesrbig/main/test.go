@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"math/big"
-	"math/rand"
-	"time"
+	//"io/ioutil"
 )
 
 func BigOdd(b *big.Int) (res *big.Int) {
@@ -16,130 +15,72 @@ func BigOdd(b *big.Int) (res *big.Int) {
 	return ip
 }
 
-func Fermat(x *big.Int, n *big.Int, p *big.Int) (res *big.Int) {
 
-	if n.Cmp(big.NewInt(0)) == 0 {
-		return big.NewInt(1)
-	}
-	tmpx := big.NewInt(0)
-	tmpx.Set(x)
-	tmpx2 := big.NewInt(0)
-	tmpx2.Set(x)
-	tmpn := big.NewInt(0)
-	tmpn.Set(n)
-	tmpn2 := big.NewInt(0)
-	tmpn2.Set(n)
-	tx := tmpx.Mul(tmpx, tmpx).Mod(tmpx, p)
-	tn := tmpn.Div(tmpn, big.NewInt(2))
-	res = Fermat(tx, tn, p)
-	if tmpn2.And(tmpn2, big.NewInt(1)).Cmp(big.NewInt(0)) != 0 {
-		res = res.Mul(res, tmpx2).Mod(res, p)
-	}
-	return res
-}
-
-func MillerRabin(a *big.Int, p *big.Int) bool {
-	tmp := big.NewInt(0)
-	tmpa := big.NewInt(0)
-	tmp.Set(p)
-	tmpa.Set(a)
-	if Fermat(a, p.Add(p, big.NewInt(-1)), tmp).Cmp(big.NewInt(1)) == 0 {
-		tmp2 := big.NewInt(0)
-		tmp2.Set(tmp)
-		tmp21 := big.NewInt(0)
-		tmp21.Set(tmp)
-		tmp22 := big.NewInt(0)
-		tmp22.Set(tmp)
-		tmp211 := big.NewInt(0)
-		tmp211.Set(tmp)
-		tmp212 := big.NewInt(0)
-		tmp212.Set(tmp)
-		u := tmp2.Add(tmp2, big.NewInt(-1)).Div(tmp2, big.NewInt(2))
-		tmp3 := big.NewInt(0)
-		tmp4 := big.NewInt(0)
-		tmp5 := big.NewInt(0)
-		tmp3.Set(u)
-		tmp4.Set(u)
-		tmp5.Set(u)
-		for {
-			if tmp3.And(tmp3, big.NewInt(1)).Cmp(big.NewInt(0)) == 0 {
-				tmp4x := big.NewInt(0)
-				tmp4x.Set(tmp5)
-				tmpa2 := big.NewInt(0)
-				tmpa2.Set(tmpa)
-				t := Fermat(tmpa2, tmp4x, tmp22)
-				if t.Cmp(big.NewInt(1)) == 0 {
-					tmp5 = tmp5.Div(tmp5, big.NewInt(2))
-				} else {
-					if t.Cmp(tmp21.Add(tmp21, big.NewInt(-1))) == 0 {
-						return true
-					}
-					return false
-				}
-			} else {
-				tmpa3 := big.NewInt(0)
-				tmpa3.Set(tmpa)
-				tmpu1 := big.NewInt(0)
-				tmpu1.Set(tmp5)
-				t := Fermat(tmpa3, tmpu1, tmp211)
-				if t.Cmp(big.NewInt(1)) == 0 || t.Cmp(tmp212.Sub(tmp212, big.NewInt(1))) == 0 {
-
-					return true
-				}
-				return false
-			}
-		}
-	}
-	return false
-}
-
-func TestMillarRabin(p *big.Int, root *big.Int) *big.Int {
-	tmp := big.NewInt(0)
-	tmp.Set(p)
-	tmp2 := big.NewInt(0)
-	tmp2.Set(p)
-	if MillerRabin(root, tmp) == false {
-		return big.NewInt(0)
-	}
-	if checkbit(tmp2) == false {
-		return big.NewInt(0)
-	}
-	fmt.Print("Success!! you have found a prime number/0.000001")
-	return p
-}
-
-func checkbit(p *big.Int) bool {
-	count := 0
-	for {
-		if p.Cmp(big.NewInt(0)) != 0 {
-			p.Div(p, big.NewInt(2))
-			count = count + 1
-		} else {
-			break
-		}
-	}
-	if count == 1024 {
-		return true
-	}
-	return false
-}
-
-func GetPrime(g *big.Int) *big.Int {
-	rand.Seed(time.Now().Unix())
-	for i := int64(rand.Intn(1000)); i < (i + 1000); i++ {
-		tmpg := big.NewInt(0)
-		tmpg.Set(g)
-		resp := BigOdd(big.NewInt(i))
-		res := TestMillarRabin(resp, tmpg)
-		if res.Cmp(big.NewInt(0)) != 0 {
-			return res
-		}
-	}
-	return big.NewInt(0)
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
 }
 
 func main() {
-	seed := big.NewInt(3)
-	pri := GetPrime(seed)
-	fmt.Print("This is the 1024 prime:", pri)
+	// a := 12222
+	// d1 := []byte(a)
+	// d2 := []byte("ahahhahah")
+	// d2 = append(d2,d1...)
+	// err := ioutil.WriteFile("test.txt", d2, 0644)
+	a := BigOdd(big.NewInt(1))
+	a2 := BigOdd(big.NewInt(2))
+	s := a.String()
+	s2 := a2.String()
+	s3 := s + "\n" +s2
+    // check(err)
+	// h := "hello"
+	// w := "world"
+	// r := h+w
+	fmt.Print(s3)
+	a = a.Add(a, big.NewInt(10))
+	fmt.Print(a)
+}
+
+// package main
+
+// import (
+//     "fmt"
+//     "os"
+//     "strconv"
+// )
+
+// func main () {
+//     for idx, args := range os.Args {
+// 		if idx == 1{
+// 			fmt.Println("参数" + strconv.Itoa(idx) + ":", args)
+// 			fmt.Print(idx)
+// 		}
+		
+//     }
+// }
+
+if idx == 1 {
+	d1 := pri.Bytes()
+	d2 := AlicePublicKey.Bytes()
+	d3 := big.NewInt(g).Bytes()
+	n := []byte("\n")
+	d := append(d1, n...)
+	d = append(d, d2...)
+	d = append(d, n...)
+	d = append(d, d3...)
+	err := ioutil.WriteFile(args, d, 0644)
+	check(err)
+}
+if idx == 2 {
+	d4 := pri.Bytes()
+	d5 := big.NewInt(g).Bytes()
+	d6 := big.NewInt(1997).Bytes()
+	n2 := []byte("\n")
+	d7 := append(d4, n2...)
+	d7 = append(d7, d5...)
+	d7 = append(d7, n2...)
+	d7 = append(d7, d6...)
+	err := ioutil.WriteFile(args, d7, 0644)
+	check(err)
 }

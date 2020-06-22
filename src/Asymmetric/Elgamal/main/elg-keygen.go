@@ -2,10 +2,18 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"math/big"
 	"math/rand"
+	"os"
 	"time"
 )
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
 
 func BigOdd(b *big.Int) (res *big.Int) {
 	im := big.NewInt(2)
@@ -104,7 +112,7 @@ func TestMillarRabin(p *big.Int, root *big.Int) *big.Int {
 	if checkbit(tmp2) == false {
 		return big.NewInt(0)
 	}
-	fmt.Print("Success!! you have found a prime number/0.000001")
+	//fmt.Print("Success!! you have found a prime number/0.000001")
 	return p
 }
 
@@ -139,7 +147,45 @@ func GetPrime(g *big.Int) *big.Int {
 }
 
 func main() {
-	seed := big.NewInt(3)
+	var g int64
+	g = 7
+	seed := big.NewInt(g)
 	pri := GetPrime(seed)
-	fmt.Print("This is the 1024 prime:", pri)
+	tmtri := big.NewInt(0)
+	tmtri.Set(pri)
+	//fmt.Print("This is the 1024 prime:", pri)
+	X := big.NewInt(1997)
+	ip := big.NewInt(1)
+	gpowX := ip.Exp(big.NewInt(g), X, nil)
+	EPublicKey := gpowX.Mod(gpowX, tmtri)
+	fmt.Print("\nThis is Elgamal pubilc key:", EPublicKey)
+	//fmt.Print("\nThis is g:", g)
+	for idx, args := range os.Args {
+		if idx == 1 {
+			d1 := pri.String()
+			d2 := EPublicKey.String()
+			d3 := big.NewInt(g).String()
+			d := d1 + "\n" + d2 + "\n" + d3
+			filename := args
+			file, err := os.Create(filename)
+			check(err)
+
+			_, err = io.WriteString(file, d)
+			check(err)
+			file.Close()
+		}
+		if idx == 2 {
+			d4 := pri.String()
+			d5 := big.NewInt(g).String()
+			d6 := big.NewInt(1997).String()
+			d7 := d4 + "\n" + d5 + "\n" + d6
+			filename2 := args
+			file2, err := os.Create(filename2)
+			check(err)
+
+			_, err = io.WriteString(file2, d7)
+			check(err)
+			file2.Close()
+		}
+	}
 }
