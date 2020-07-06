@@ -1,5 +1,4 @@
-# Golang Ping for Cloudflare Internship Application: Systems
-
+# Golang Ping
 This program can be used as CLI ping application
 You must use this application based on Golang
 Install Golang: https://golang.org/dl/
